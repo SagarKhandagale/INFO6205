@@ -20,25 +20,9 @@ public class Main {
         processArgs(args);
         System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
         Random random = new Random();
-        int[] array = new int[2000000];
-        ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
-            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-            long time;
-            long startTime = System.currentTimeMillis();
-            for (int t = 0; t < 10; t++) {
-                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                ParSort.sort(array, 0, array.length);
-            }
-            long endTime = System.currentTimeMillis();
-            time = (endTime - startTime);
-            timeList.add(time);
-
-
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
-
-        }
+        int[] array = new int[5000000];
+//        ArrayList<Long> timeList = ParSortCutoff(random, array);
+        ArrayList<Long> timeList = ParSortDepth(random, array);
         try {
             FileOutputStream fis = new FileOutputStream("./src/result.csv");
             OutputStreamWriter isr = new OutputStreamWriter(fis);
@@ -56,6 +40,49 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    private static ArrayList<Long> ParSortCutoff(Random random, int[] array) {
+        ArrayList<Long> timeList = new ArrayList<>();
+        for (int j = 50; j < 100; j++) {
+            ParSort.cutoff = 20000 * (j + 1);
+            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+            long time;
+            long startTime = System.currentTimeMillis();
+            for (int t = 0; t < 10; t++) {
+                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                ParSort.sort(array, 0, array.length);
+            }
+            long endTime = System.currentTimeMillis();
+            time = (endTime - startTime);
+            timeList.add(time);
+
+
+            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
+
+        }
+        return timeList;
+    }
+    private static ArrayList<Long> ParSortDepth(Random random, int[] array) {
+        ArrayList<Long> timeList = new ArrayList<>();
+        for (int depth = 1; depth <= 13; depth++) {
+            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+            long time;
+            long startTime = System.currentTimeMillis();
+            for (int t = 0; t < 10; t++) {
+                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                ParSortDepth.sort(array, 0, array.length,depth);
+            }
+            long endTime = System.currentTimeMillis();
+            time = (endTime - startTime);
+            timeList.add(time);
+
+
+            System.out.println("Depth：" + depth + "\t\t10times Time:" + time + "ms");
+
+        }
+        return timeList;
+    }
+
 
     private static void processArgs(String[] args) {
         String[] xs = args;
